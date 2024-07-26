@@ -13,8 +13,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
-bot_username = "your_bot_username"
+TOKEN = "7449252023:AAGl88ZXaJD6Gu1M49zmnZNUvddsgIZZ0C0"
+if not TOKEN:
+    raise ValueError("No TELEGRAM_BOT_TOKEN found in environment variables")
+
+bot_username = "ethioytdownloaderbot"
 
 MAX_CHUNK_SIZE = 49 * 1024 * 1024  # Slightly less than 50MB to avoid boundary issues
 
