@@ -13,7 +13,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TOKEN = "7449252023:AAGl88ZXaJD6Gu1M49zmnZNUvddsgIZZ0C0"
+#TOKEN = "7449252023:AAGl88ZXaJD6Gu1M49zmnZNUvddsgIZZ0C0"
+TOKEN = "7322646122:AAFsMtnbFX2eSPfLtTTwIl2314biPQkTrKw"
 if not TOKEN:
     raise ValueError("No TELEGRAM_BOT_TOKEN found in environment variables")
 
