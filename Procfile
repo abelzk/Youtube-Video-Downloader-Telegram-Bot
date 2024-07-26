@@ -1,1 +1,1 @@
-worker: ty-dl.py
+worker: python ty-dl.py
