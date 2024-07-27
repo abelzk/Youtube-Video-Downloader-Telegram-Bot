@@ -88,7 +88,7 @@ async def download_youtube_video(update: Update, context: CallbackContext) -> No
     for url in valid_urls:
         try:
             ydl_opts = {
-                'format': 'best',
+                'format': 'best[height<=360]',
                 'progress_hooks': [lambda d: progress_hook(d, status_message, context)],
                 'outtmpl': 'downloads/%(title)s.%(ext)s',
             }
