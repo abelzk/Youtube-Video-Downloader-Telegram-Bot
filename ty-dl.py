@@ -2,9 +2,9 @@ import logging
 import os
 import yt_dlp
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
-import time
-import zipfile
+from telegram.ext import CommandHandler, MessageHandler, filters, CallbackContext
+from telegram.ext._application import Application
+from moviepy.video.io.VideoFileClip import VideoFileClip
 import math
 
 # Enable logging
@@ -13,12 +13,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-#TOKEN = "7449252023:AAGl88ZXaJD6Gu1M49zmnZNUvddsgIZZ0C0"
 TOKEN = "7322646122:AAFsMtnbFX2eSPfLtTTwIl2314biPQkTrKw"
 if not TOKEN:
     raise ValueError("No TELEGRAM_BOT_TOKEN found in environment variables")
 
-bot_username = "ethioytdownloaderbot"
+bot_username = "your_bot_username"
 
 MAX_CHUNK_SIZE = 49 * 1024 * 1024  # Slightly less than 50MB to avoid boundary issues
 
@@ -36,7 +35,7 @@ def progress_hook(d, status_message, context):
 async def send_file(update, context, file_path, caption):
     file_size = os.path.getsize(file_path)
     if file_size > MAX_CHUNK_SIZE:
-        await send_large_file(update, context, file_path, caption)
+        await split_and_send_large_file(update, context, file_path, caption)
     else:
         await context.bot.send_document(
             chat_id=update.effective_chat.id,
@@ -47,24 +46,33 @@ async def send_file(update, context, file_path, caption):
         os.remove(file_path)  # Delete the file after sending
         logger.info(f"Successfully sent and removed file: {file_path}")
 
-async def send_large_file(update, context, file_path, caption):
+async def split_and_send_large_file(update, context, file_path, caption):
+    video = VideoFileClip(file_path)
+    video_duration = video.duration  # Duration in seconds
     file_size = os.path.getsize(file_path)
     num_chunks = math.ceil(file_size / MAX_CHUNK_SIZE)
+    chunk_duration = video_duration / num_chunks
 
-    with open(file_path, 'rb') as f:
-        for i in range(num_chunks):
-            chunk_data = f.read(MAX_CHUNK_SIZE)
-            chunk_path = f"{file_path}.part{i+1}"
-            with open(chunk_path, 'wb') as chunk_file:
-                chunk_file.write(chunk_data)
-            await context.bot.send_document(
-                chat_id=update.effective_chat.id,
-                document=open(chunk_path, 'rb'),
-                caption=f"{caption} (part {i+1}/{num_chunks})",
-                reply_to_message_id=update.message.message_id
-            )
-            os.remove(chunk_path)  # Delete the chunk after sending
+    base_filename = os.path.splitext(file_path)[0]
 
+    for i in range(num_chunks):
+        start_time = i * chunk_duration
+        end_time = start_time + chunk_duration
+        chunk_path = f"{base_filename}_part{i+1}.mp4"
+
+        # Write the subclip to a file
+        video.subclip(start_time, end_time).write_videofile(chunk_path, codec="libx264", audio_codec="aac")
+
+        # Send the chunk
+        await context.bot.send_document(
+            chat_id=update.effective_chat.id,
+            document=open(chunk_path, 'rb'),
+            caption=f"{caption} (part {i+1}/{num_chunks})",
+            reply_to_message_id=update.message.message_id
+        )
+        os.remove(chunk_path)  # Delete the chunk after sending
+
+    video.close()
     os.remove(file_path)  # Delete the original file after sending
 
 async def download_youtube_video(update: Update, context: CallbackContext) -> None:
