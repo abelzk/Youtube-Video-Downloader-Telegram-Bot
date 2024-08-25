@@ -15,7 +15,7 @@ This is a Telegram bot that allows users to download YouTube videos by simply se
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/youtube-video-downloader-telegram-bot.git
+    git clone https://github.com/abelzk/Youtube-Video-Downloader-Telegram-Bot.git
     cd youtube-video-downloader-telegram-bot
     ```
 
