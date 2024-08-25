@@ -32,7 +32,7 @@ This is a Telegram bot that allows users to download YouTube videos by simply se
 4. **Run the bot:**
 
     ```bash
-    python bot.py
+    python ty-dl.py
     ```
 
 ## Usage
