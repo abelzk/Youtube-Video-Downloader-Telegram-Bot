@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TOKEN = "7322646122:AAFsMtnbFX2eSPfLtTTwIl2314biPQkTrKw"
+TOKEN = "YOUR API KEY"
 if not TOKEN:
     raise ValueError("No TELEGRAM_BOT_TOKEN found in environment variables")
 
